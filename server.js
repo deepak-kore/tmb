@@ -87,21 +87,21 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
             accountUpdate.fromAccount = filter.fromAccount;
             accountUpdate.fromRemainingFreeTransfer = fromRemainingFreeTransfer
             AccountTable.updatedBalanceForPayer(accountUpdate)
-                .then(function (result) {
-                    //calculating the to balnace and updating the payee account available balance in the database.
-                    toBalance = parseFloat(res[1].availableBalance) + (parseFloat(filter.ammount));
-                    var toAccountUpdate = {};
-                    toAccountUpdate.toAccount = request.body.toAccount
-                    toAccountUpdate.availableBalance = toBalance
-                    return AccountTable.updatedToBalance(toAccountUpdate);
-                })
-                .then(function (res) {
-                    return response.send(res);
-                })
-                .catch(function (err) {
-                    console.log(err);
-                    return response.status(500).send(err);
-                });
+            .then(function (result) {
+                //calculating the to balnace and updating the payee account available balance in the database.
+                toBalance = parseFloat(res[1].availableBalance) + (parseFloat(filter.ammount));
+                var toAccountUpdate = {};
+                toAccountUpdate.toAccount = request.body.toAccount
+                toAccountUpdate.availableBalance = toBalance
+                return AccountTable.updatedToBalance(toAccountUpdate);
+            })
+            .then(function (myresponse) {
+                return response.send(res);
+            })
+            .catch(function (err) {
+                console.log(err);
+                return response.status(500).send(err);
+            });
         })
         .catch(function (err) {
             console.log(err);

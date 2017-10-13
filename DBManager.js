@@ -1,5 +1,6 @@
+var config = require("./config.js");
 var mongodb = require("mongodb");
-var url = "mongodb://52.71.161.217:27017/tmb";
+var url = "mongodb://" + config.db.ip + ":" + config.db.port + "/" + config.db.cn;
 
 function getConnection(callback) {
     if(!global.MongoClient){
