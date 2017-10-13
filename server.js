@@ -66,18 +66,29 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
             var fromBalance = 0;
             var fromRemainingFreeTransfer = 0;
             var toBalance = 0;
-            if (res[0].availableBalance <= filter.amount) {
+            var payerAccount =[];
+            var payeeAccount = [];
+            for(i = 0; i < res.length; i++){
+                if(res[i].accountNumber == filter.fromAccount){
+                    payerAccount = res[i];
+                }
+                
+                if(res[i].accountNumber == filter.toAccount){
+                    payeeAccount = res[i];
+                }
+            }
+            if (payerAccount.availableBalance <= filter.amount) {
                 return resolve({ error: "Insufficient balance" })
             } else {
-                if (res[1].remainingFreeTransfers > 0) {
-                    fromBalance = res[1].availableBalance - filter.amount;
-                    fromRemainingFreeTransfer = res[1].remainingFreeTransfers - 1;
+                if (payerAccount.remainingFreeTransfers > 0) {
+                    fromBalance = payerAccount.availableBalance - filter.amount;
+                    fromRemainingFreeTransfer = payerAccount.remainingFreeTransfers - 1;
                     transfer = true;
                 } else {
-                    if (res[1].availableBalance <= filter.amount+2) {
+                    if (payerAccount.availableBalance <= filter.amount+2) {
                         return resolve({ error: "Insufficient balance" })
                     }
-                    fromBalance = parseFloat(res[1].availableBalance) - (parseFloat(filter.amount) + 2);
+                    fromBalance = parseFloat(payerAccount.availableBalance) - (parseFloat(filter.amount) + 2);
                     transfer = true;
                 }
             }
@@ -89,14 +100,14 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
             AccountTable.updatedBalanceForPayer(accountUpdate)
             .then(function (result) {
                 //calculating the to balnace and updating the payee account available balance in the database.
-                toBalance = parseFloat(res[0].availableBalance) + (parseFloat(filter.amount));
+                toBalance = parseFloat(payeeAccount.availableBalance) + (parseFloat(filter.amount));
                 var toAccountUpdate = {};
                 toAccountUpdate.toAccount = request.body.toAccount
                 toAccountUpdate.availableBalance = toBalance
                 return AccountTable.updatedToBalance(toAccountUpdate);
             })
             .then(function (myresponse) {
-                return response.send(res);
+                return response.send(myresponse);
             })
             .catch(function (err) {
                 console.log(err);
