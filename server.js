@@ -11,6 +11,20 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
+
+app.post('/tmb/bot/accountBalance', function (request, response) {
+    var filter = {};
+    filter.accountNumber = request.body.accountNumber;
+    return AccountTable.getAccountInfoForInterest(filter)
+        .then(function (res) {
+            return response.send(res);
+        })
+        .catch(function (err) {
+            console.log(err);
+            return response.status(500).send(err);
+        });
+});
+
 //get account Info
 app.post('/tmb/bot/getAccountDetails', function (request, response) {
     var filter = {};
@@ -25,12 +39,43 @@ app.post('/tmb/bot/getAccountDetails', function (request, response) {
                     data['payeeList'] = paylist || [];
                     return response.send(data);
                 });
-
             }
-
             else {
                 return response.send(data);
             }
+        })
+        .catch(function (err) {
+            console.log(err);
+            return response.status(500).send(err);
+        });
+});
+
+//update Account balance and intrest
+app.post('/tmb/bot/updatedBalanceAndInterest', function (request, response) {
+    var filter = {};
+    filter.accountNumber = request.body.accountNumber;
+    filter.availableBalance =  request.body.availableBalance;
+    filter.accruedInterest = request.body.accruedInterest;
+    return AccountTable.updatedBalanceAndInterest(filter)
+        .then(function (res) {
+            return response.send(res);
+        })
+        .catch(function (err) {
+            console.log(err);
+            return response.status(500).send(err);
+        });
+});
+
+
+
+//Get Transaction details
+app.post('/tmb/bot/transactionDetails', function (request, response) {
+    var filter = {};
+    filter.accountNumber = request.body.accountNumber;
+    console.log("request----",filter);
+    return TransactionTable.getTransactionDetails(filter)
+        .then(function (res) {
+            return response.send(res);
         })
         .catch(function (err) {
             console.log(err);
@@ -100,8 +145,8 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
             AccountTable.updatedBalanceForPayer(accountUpdate)
             .then(function (result) {
                 var txnPayerAccount = {};
-                txnPayerAccount.fromAccountNumber = payerAccount.accountNumber;
-                txnPayerAccount.toAccountNumber = payeeAccount.accountNumber;
+                txnPayerAccount.accountNumber = payerAccount.accountNumber;
+                txnPayerAccount.txnAccountNumber = payeeAccount.accountNumber;
                 txnPayerAccount.transactionType = "Debit";
                 txnPayerAccount.amount = filter.amount;
                 txnPayerAccount.txnDate = new Date();
@@ -109,8 +154,8 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
             })
             .then(function (result){
                 var txnPayeeAccount = {};
-                txnPayeeAccount.fromAccountNumber = payerAccount.accountNumber;
-                txnPayeeAccount.toAccountNumber = payeeAccount.accountNumber;
+                txnPayeeAccount.accountNumber = payerAccount.accountNumber;
+                txnPayeeAccount.txnAccountNumber = payeeAccount.accountNumber;
                 txnPayeeAccount.transactionType = "Credit";
                 txnPayeeAccount.amount = filter.amount;
                 txnPayeeAccount.txnDate = new Date();

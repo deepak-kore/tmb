@@ -5,8 +5,24 @@ var Promise = require("bluebird");
 function TransactionTable() {
 }
 
+//Get transaction details for an account
+TransactionTable.prototype.getTransactionDetails = function (filter) {
+    return new Promise(function (resolve, reject) {
+        dbManager.getConnection(function (db) {
+            db.collection(collectionName).find({
+                accountNumber: filter.accountNumber
+            })
+                .toArray(function (err, res) {
+                    if (err) {
+                        return reject(err);
+                    }
+                    return resolve(res);
+                });
+        });
+    });
+}
 
-//get inventory details for product
+//adding transaction details in Transaction table for payer
 TransactionTable.prototype.insertTransactionForPayer = function (filter) {
     return new Promise(function (resolve, reject) {
         dbManager.getConnection(function (db) {
@@ -23,6 +39,7 @@ TransactionTable.prototype.insertTransactionForPayer = function (filter) {
     });
 }
 
+//adding transaction details in Transaction table for payee
 TransactionTable.prototype.insertTransactionForPayee = function (filter) {
     return new Promise(function (resolve, reject) {
         dbManager.getConnection(function (db) {
