@@ -10,20 +10,34 @@ function TransactionTable() {
 TransactionTable.prototype.insertTransactionForPayer = function (filter) {
     return new Promise(function (resolve, reject) {
         dbManager.getConnection(function (db) {
-            db.collection(collectionName).insert({
-                // userId: {$regex : new RegExp(filter.userId, "i") },
-                
-            })
-                .toArray(function (err, res) {
+            db.collection(collectionName).insert(
+                filter, function (err, res) {
+                    console.log(res);
                     if (err) {
                         return reject(err);
                     }
-                    return resolve(res);
-                });
+                    return resolve(res.ops[0]);
+                }
+            )
         });
     });
 }
 
+TransactionTable.prototype.insertTransactionForPayee = function (filter) {
+    return new Promise(function (resolve, reject) {
+        dbManager.getConnection(function (db) {
+            db.collection(collectionName).insert(
+                filter, function (err, res) {
+                    console.log(res);
+                    if (err) {
+                        return reject(err);
+                    }
+                    return resolve(res.ops[0]);
+                }
+            )
+        });
+    });
+}
 module.exports = {
     getInst: function () {
         return new TransactionTable();

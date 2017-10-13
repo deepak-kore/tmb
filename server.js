@@ -99,15 +99,34 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
             accountUpdate.fromRemainingFreeTransfer = fromRemainingFreeTransfer
             AccountTable.updatedBalanceForPayer(accountUpdate)
             .then(function (result) {
+                var txnPayerAccount = {};
+                txnPayerAccount.fromAccountNumber = payerAccount.accountNumber;
+                txnPayerAccount.toAccountNumber = payeeAccount.accountNumber;
+                txnPayerAccount.transactionType = "Debit";
+                txnPayerAccount.amount = filter.amount;
+                txnPayerAccount.txnDate = new Date();
+                TransactionTable.insertTransactionForPayer(txnPayerAccount)
+            })
+            .then(function (result){
+                var txnPayeeAccount = {};
+                txnPayeeAccount.fromAccountNumber = payerAccount.accountNumber;
+                txnPayeeAccount.toAccountNumber = payeeAccount.accountNumber;
+                txnPayeeAccount.transactionType = "Credit";
+                txnPayeeAccount.amount = filter.amount;
+                txnPayeeAccount.txnDate = new Date();
+                TransactionTable.insertTransactionForPayee(txnPayeeAccount)
+            })
+            .then(function (result) {
                 //calculating the to balnace and updating the payee account available balance in the database.
                 toBalance = parseFloat(payeeAccount.availableBalance) + (parseFloat(filter.amount));
                 var toAccountUpdate = {};
                 toAccountUpdate.toAccount = request.body.toAccount
                 toAccountUpdate.availableBalance = toBalance
                 return AccountTable.updatedToBalance(toAccountUpdate);
+                //return response.send(myresponse);
             })
-            .then(function (myresponse) {
-                return response.send(myresponse);
+            .then(function(result){
+                return response.send(result);
             })
             .catch(function (err) {
                 console.log(err);
@@ -121,7 +140,7 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
 });
 
 
-var port = 3050;
+var port = 3060;
 app.listen(port, function () {
     console.log('Example app listening on port !', port)
 });
