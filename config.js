@@ -1,7 +1,7 @@
 var config = {
     db: {
         port    : 27017,
-        ip      : "52.71.161.217",
+        ip      : "localhost",
         cn      : "tmb"
     }
 }
