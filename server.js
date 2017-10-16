@@ -185,7 +185,7 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
 });
 
 
-var port = 3060;
+var port = 3050;
 app.listen(port, function () {
     console.log('Example app listening on port !', port)
 });
