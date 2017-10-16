@@ -123,7 +123,7 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
                 }
             }
             if (payerAccount.availableBalance <= filter.amount) {
-                return resolve({ error: "Insufficient balance" })
+                return Promise.reject({ error: "Insufficient balance" })
             } else {
                 if (payerAccount.remainingFreeTransfers > 0) {
                     fromBalance = payerAccount.availableBalance - filter.amount;
@@ -131,7 +131,7 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
                     transfer = true;
                 } else {
                     if (payerAccount.availableBalance <= filter.amount+2) {
-                        return resolve({ error: "Insufficient balance" })
+                        return Promise.reject({ error: "Insufficient balance" })
                     }
                     fromBalance = parseFloat(payerAccount.availableBalance) - (parseFloat(filter.amount) + 2);
                     transfer = true;
