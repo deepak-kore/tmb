@@ -153,9 +153,9 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
                 TransactionTable.insertTransactionForPayer(txnPayerAccount)
             })
             .then(function (result){
-                var txnPayeeAccount = {};
-                txnPayeeAccount.accountNumber = payerAccount.accountNumber;
-                txnPayeeAccount.txnAccountNumber = payeeAccount.accountNumber;
+                var txnPayeeAccount = {};payeeAccount
+                txnPayeeAccount.accountNumber = payeeAccount.accountNumber;
+                txnPayeeAccount.txnAccountNumber = payerAccount.accountNumber;
                 txnPayeeAccount.transactionType = "Credit";
                 txnPayeeAccount.amount = filter.amount;
                 txnPayeeAccount.txnDate = new Date();
