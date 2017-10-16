@@ -41,7 +41,7 @@ app.post('/tmb/bot/getAccountDetails', function (request, response) {
                 });
             }
             else {
-                return response.send(data);
+                return response.send({ error: "Incorrect id" });
             }
         })
         .catch(function (err) {
