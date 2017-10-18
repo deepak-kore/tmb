@@ -110,6 +110,7 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
             var transfer = false;
             var fromBalance = 0;
             var fromRemainingFreeTransfer = 0;
+            var transferChargesApplied = false;
             var toBalance = 0;
             var payerAccount =[];
             var payeeAccount = [];
@@ -134,6 +135,7 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
                         return Promise.reject({ error: "Insufficient balance" })
                     }
                     fromBalance = parseFloat(payerAccount.availableBalance) - (parseFloat(filter.amount) + 2);
+                    transferChargesApplied = true;
                     transfer = true;
                 }
             }
@@ -145,6 +147,9 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
             AccountTable.updatedBalanceForPayer(accountUpdate)
             .then(function (result) {
                 var txnPayerAccount = {};
+                if(transferChargesApplied == true){
+                    txnPayerAccount.transferCharge = 2;
+                }
                 txnPayerAccount.accountNumber = payerAccount.accountNumber;
                 txnPayerAccount.txnAccountNumber = payeeAccount.accountNumber;
                 txnPayerAccount.transactionType = "Debit";
