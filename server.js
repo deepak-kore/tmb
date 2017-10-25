@@ -11,6 +11,11 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
+app.get('/tmb/bot/image/:name', function(request, response){
+    var filename = request.params.name;
+    console.log(filename);
+    response.sendFile(__dirname+"/images/"+filename);
+});
 
 app.post('/tmb/bot/accountBalance', function (request, response) {
     var filter = {};
