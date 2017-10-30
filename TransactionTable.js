@@ -11,7 +11,7 @@ TransactionTable.prototype.getTransactionDetails = function (filter) {
         dbManager.getConnection(function (db) {
             db.collection(collectionName).find({
                 accountNumber: filter.accountNumber
-            })
+            },{sort:{txnDate:-1}})
                 .toArray(function (err, res) {
                     if (err) {
                         return reject(err);
