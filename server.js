@@ -128,7 +128,7 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
                     payeeAccount = res[i];
                 }
             }
-            if (payerAccount.availableBalance <= filter.amount) {
+            if (payerAccount.availableBalance < filter.amount) {
                 return Promise.reject({ error: "Insufficient balance" })
             } else {
                 if (payerAccount.remainingFreeTransfers > 0) {
