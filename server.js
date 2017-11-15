@@ -71,8 +71,6 @@ app.post('/tmb/bot/updatedBalanceAndInterest', function (request, response) {
         });
 });
 
-
-
 //Get Transaction details
 app.post('/tmb/bot/transactionDetails', function (request, response) {
     var filter = {};
@@ -129,7 +127,18 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
                 }
             }
             if (payerAccount.availableBalance < filter.amount) {
-                return Promise.reject({ error: "Insufficient balance" })
+                    var txnPayerAccount = {};
+                    if(transferChargesApplied == true){
+                        txnPayerAccount.transferCharge = 2;
+                    }
+                    txnPayerAccount.accountNumber = payerAccount.accountNumber;
+                    txnPayerAccount.txnAccountNumber = payeeAccount.accountNumber;
+                    txnPayerAccount.transactionType = "Debit";
+                    txnPayerAccount.amount = filter.amount;
+                    txnPayerAccount.txnstatus = "Failed"
+                    txnPayerAccount.txnDate = new Date();
+                    TransactionTable.insertTransactionForPayer(txnPayerAccount)
+                    return Promise.reject({ error: "Insufficient balance" })
             } else {
                 if (payerAccount.remainingFreeTransfers > 0) {
                     fromBalance = payerAccount.availableBalance - filter.amount;
@@ -137,7 +146,18 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
                     transfer = true;
                 } else {
                     if (payerAccount.availableBalance <= filter.amount+2) {
-                        return Promise.reject({ error: "Insufficient balance" })
+                            var txnPayerAccount = {};
+                            if(transferChargesApplied == true){
+                                txnPayerAccount.transferCharge = 2;
+                            }
+                            txnPayerAccount.accountNumber = payerAccount.accountNumber;
+                            txnPayerAccount.txnAccountNumber = payeeAccount.accountNumber;
+                            txnPayerAccount.transactionType = "Debit";
+                            txnPayerAccount.amount = filter.amount;
+                            txnPayerAccount.txnstatus = "Failed"
+                            txnPayerAccount.txnDate = new Date();
+                            TransactionTable.insertTransactionForPayer(txnPayerAccount)
+                            return Promise.reject({ error: "Insufficient balance" })
                     }
                     fromBalance = parseFloat(payerAccount.availableBalance) - (parseFloat(filter.amount) + 2);
                     transferChargesApplied = true;
@@ -159,6 +179,7 @@ app.post('/tmb/bot/fundsTransfer', function (request, response) {
                 txnPayerAccount.txnAccountNumber = payeeAccount.accountNumber;
                 txnPayerAccount.transactionType = "Debit";
                 txnPayerAccount.amount = filter.amount;
+                txnPayerAccount.txnstatus = "Success"
                 txnPayerAccount.txnDate = new Date();
                 TransactionTable.insertTransactionForPayer(txnPayerAccount)
             })
